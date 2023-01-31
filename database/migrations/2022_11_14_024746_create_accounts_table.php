@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')
+            ->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('account_categorie_id')->constrained('account_categories')
             ->onUpdate('cascade')->onDelete('cascade');
             $table->string('name')->unique();
@@ -22,6 +24,7 @@ return new class extends Migration
             $table->float('initial_cre_balance');
             $table->date('cutoff_date');
             $table->timestamps();
+
         });
     }
 

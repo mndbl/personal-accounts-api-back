@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\API\BaseController;
 use App\Models\Settings\AccountCategorie;
+use Illuminate\Support\Facades\Auth;
 
 class AccountController extends BaseController
 {
@@ -20,7 +21,9 @@ class AccountController extends BaseController
         if (count(Account::all()) < 1) {
             return $this->sendError('No accounts have been created yet', ['error' => 'Empty information.'], 201);
         }
-        return $this->sendResponse(Account::with(['account_categorie', 'registers_deb', 'registers_cre'])->orderBy('name', 'asc')->get(), 'Accounts list');
+        $accounts = Account::with(['account_categorie', 'registers_deb', 'registers_cre'])
+            ->where('user_id', Auth::user()->id)->orderBy('name', 'asc')->get();
+        return $this->sendResponse($accounts, 'Accounts list');
     }
 
     /**
@@ -42,6 +45,7 @@ class AccountController extends BaseController
             'initial_cre_balance' => 'required|numeric',
             'cutoff_date' => 'required|date',
         ]);
+
         $validCategorie = AccountCategorie::find($request->account_categorie_id);
         if (!$validCategorie) {
             return $this->sendError('The category does not exist', ['error' => 'The category does not exist'], 201);
@@ -49,8 +53,15 @@ class AccountController extends BaseController
         if ($validator->fails()) {
             return $this->sendError('You must add all the account information.', $validator->errors(), 201);
         }
-
-        $newAccount = Account::create($request->all());
+        $data = [
+            'user_id' => Auth::user()->id,
+            'account_categorie_id' => $request->account_categorie_id,
+            'name' => $request->name,
+            'initial_deb_balance' => $request->initial_deb_balance,
+            'initial_cre_balance' => $request->initial_cre_balance,
+            'cutoff_date' => $request->cutoff_date,
+        ];
+        $newAccount = Account::create($data);
         return $this->sendResponse($newAccount, 'Successfully registered');
     }
 
@@ -99,6 +110,7 @@ class AccountController extends BaseController
         if ($validator->fails()) {
             return $this->sendError('You must add all the account information.', $validator->errors(), 201);
         }
+        $accountToUpdate->user_id=Auth::user()->id;
         $accountToUpdate->account_categorie_id = $request->account_categorie_id;
         $accountToUpdate->name = $request->name;
         $accountToUpdate->initial_deb_balance = $request->initial_deb_balance;

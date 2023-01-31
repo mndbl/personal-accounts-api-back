@@ -6,6 +6,7 @@ use App\Http\Controllers\API\BaseController;
 use App\Models\Data\Register;
 use App\Models\Settings\Account;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends BaseController
@@ -17,7 +18,8 @@ class RegisterController extends BaseController
      */
     public function index()
     {
-        $registers = Register::with(['account_deb', 'account_cre', 'account_deb.account_categorie', 'account_cre.account_categorie'])
+        $registers = Register::where('user_id', Auth::user()->id)
+            ->with(['account_deb', 'account_cre', 'account_deb.account_categorie', 'account_cre.account_categorie'])
             ->orderBy('date', 'desc')->get();
         if (count($registers) < 1) {
             return $this->sendError('No registers have been created yet', ['error' => 'Empty information'], 201);
@@ -56,8 +58,15 @@ class RegisterController extends BaseController
         if ($validator->fails()) {
             return $this->sendError('You must add all the information.', $validator->errors(), 201);
         }
-
-        $newRegister = Register::create($request->all());
+        $data = [
+            'user_id' => Auth::user()->id,
+            'date' => $request->date,
+            'account_id_deb' => $request->account_id_deb,
+            'account_id_cre' => $request->account_id_cre,
+            'description' => $request->description,
+            'amount' => $request->amount
+        ];
+        $newRegister = Register::create($data);
 
         return $this->sendResponse($newRegister, 'Register created successfully');
     }
@@ -116,7 +125,15 @@ class RegisterController extends BaseController
         if ($validator->fails()) {
             return $this->sendError('You must add all the information.', $validator->errors(), 201);
         }
-        $register->update($request->all());
+        $data = [
+            'user_id' => Auth::user()->id,
+            'date' => $request->date,
+            'account_id_deb' => $request->account_id_deb,
+            'account_id_cre' => $request->account_id_cre,
+            'description' => $request->description,
+            'amount' => $request->amount
+        ];
+        $register->update($data);
         return $this->sendResponse($register, 'Register updated successfully');
     }
 

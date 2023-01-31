@@ -9,7 +9,7 @@ class AccountCategorie extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'name', 'type'
+       'user_id', 'name', 'type'
     ];
 
     public function accounts()

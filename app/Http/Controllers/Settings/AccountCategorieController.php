@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\API\BaseController;
 use App\Models\Settings\AccountCategorie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AccountCategorieController extends BaseController
@@ -16,7 +17,7 @@ class AccountCategorieController extends BaseController
      */
     public function index()
     {
-        $accountCategories = AccountCategorie::orderBy('name', 'asc')->get();
+        $accountCategories = AccountCategorie::orderBy('name', 'asc')->where('user_id', Auth::user()->id)->get();
         if (count($accountCategories) < 1) {
             return $this->sendError('No account categories have been created yet', ['error' => 'Empty information'], 201);
         }
@@ -43,8 +44,13 @@ class AccountCategorieController extends BaseController
         if ($validator->fails()) {
             return $this->sendError('You must add all the information', $validator->errors(), 201);
         }
+        $data = [
+            'user_id' => Auth::user()->id,
+            'name' => $request->name,
+            'type' => $request->type
+        ];
 
-        $newAccountCategorie = AccountCategorie::create($request->all());
+        $newAccountCategorie = AccountCategorie::create($data);
         return $this->sendResponse($newAccountCategorie, 'Succefully registered');
     }
 
@@ -75,7 +81,7 @@ class AccountCategorieController extends BaseController
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'id' => 'required|numeric',
+
             'name' => 'required|min:3',
             'type' => 'required|min:3'
         ]);
@@ -88,6 +94,7 @@ class AccountCategorieController extends BaseController
             return $this->sendError('You must add all the information', $validator->errors(), 201);
         }
 
+        $accountCategorie->user_id = Auth::user()->id;
         $accountCategorie->name = $request->name;
         $accountCategorie->type = $request->type;
         $accountCategorie->save();

@@ -15,9 +15,12 @@ return new class extends Migration
     {
         Schema::create('account_categories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')
+            ->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name')->unique();
             $table->string('type');
             $table->timestamps();
+
         });
     }
 

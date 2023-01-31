@@ -12,7 +12,7 @@ class Register extends Model
 {
     use HasFactory, SoftDeletes;
     protected $fillable = [
-        'date', 'account_id_deb','account_id_cre', 'description', 'amount'
+        'date','user_id', 'account_id_deb','account_id_cre', 'description', 'amount'
     ];
 
     public function account_deb()

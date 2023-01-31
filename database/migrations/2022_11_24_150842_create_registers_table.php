@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('registers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')
+            ->cascadeOnUpdate()->cascadeOnDelete();
             $table->date('date');
             $table->foreignId('account_id_deb')->constrained('accounts')
             ->cascadeOnUpdate()->cascadeOnDelete();
