@@ -22,6 +22,7 @@ class ConsultController extends BaseController
 
         $accounts = Account::with(['registers_deb', 'registers_cre', 'account_categorie'])
         ->get();
+        $accounts['actual_balance']=0;
         return $this->sendResponse($accounts, 'Data');
     }
     /**

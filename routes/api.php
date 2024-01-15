@@ -5,6 +5,7 @@ use Illuminate\Routing\RouteGroup;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\Data\ConsultController;
+use App\Http\Controllers\Data\HistoricController;
 use App\Http\Controllers\Data\RegisterController;
 use App\Http\Controllers\Settings\AccountCategorieController;
 use App\Http\Controllers\Settings\AccountController;
@@ -22,7 +23,8 @@ use App\Http\Controllers\Settings\AccountController;
 
 Route::post('login', [AuthController::class, 'signin']);
 Route::post('register', [AuthController::class, 'signup']);
-
+Route::get('historic',[HistoricController::class,'registerLastYear']);
+Route::get('copy-registers',[HistoricController::class,'copyRegister']);
 
 Route::middleware('auth:sanctum')->prefix('/')->group(function () {
     Route::get('user', [AuthController::class, 'userAuth']);

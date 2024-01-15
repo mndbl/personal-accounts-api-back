@@ -23,6 +23,7 @@ class Account extends Model
         return $this->belongsTo(AccountCategorie::class);
     }
 
+
     public function registers_deb()
     {
         return $this->hasMany(Register::class, 'account_id_deb');
